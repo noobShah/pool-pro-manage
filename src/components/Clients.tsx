@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -59,11 +58,7 @@ export const Clients = () => {
 
   const handleSaveClient = (clientData: Omit<Client, 'id' | 'projectsCount' | 'totalValue'>) => {
     if (modalMode === 'add') {
-      const newClient = addClient({
-        ...clientData,
-        projectsCount: 0,
-        totalValue: '₹0'
-      });
+      const newClient = addClient(clientData);
       toast({
         title: "Client added",
         description: `${newClient.name} has been added successfully.`,

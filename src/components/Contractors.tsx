@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -58,12 +57,9 @@ export const Contractors = () => {
     }
   };
 
-  const handleSaveContractor = (contractorData: Omit<Contractor, 'id' | 'projectsCount'>) => {
+  const handleSaveContractor = (contractorData: Omit<Contractor, 'id' | 'projectsCount' | 'rating'>) => {
     if (modalMode === 'add') {
-      const newContractor = addContractor({
-        ...contractorData,
-        projectsCount: 0
-      });
+      const newContractor = addContractor(contractorData);
       toast({
         title: "Contractor added",
         description: `${newContractor.name} has been added successfully.`,
