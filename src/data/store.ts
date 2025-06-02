@@ -26,18 +26,30 @@ export interface Contractor {
 export interface Project {
   id: string;
   title: string;
-  client: string;
   clientId: string;
-  contractor: string;
+  clientName: string;
   contractorId: string;
+  contractorName: string;
   city: string;
   scope: string;
-  status: 'Planning' | 'Under Construction' | 'Completed' | 'On Hold';
+  status: 'Quotation Sent' | 'Under Construction' | 'Completed' | 'On Hold';
   progress: number;
-  startDate: string;
-  endDate: string;
-  budget: string;
-  description: string;
+  statusColor: string;
+  totalValue?: string;
+  startDate?: string;
+  expectedCompletion?: string;
+  lastUpdated: string;
+}
+
+export interface Document {
+  id: string;
+  projectId: string;
+  projectName: string;
+  type: 'quotation' | 'mom' | 'photos' | 'work-order' | 'payment-receipt' | 'gst-document' | 'visit-report';
+  name: string;
+  uploadDate: string;
+  size: string;
+  url?: string;
 }
 
 // Initial data
@@ -117,203 +129,232 @@ export const initialProjects: Project[] = [
   {
     id: 'AQ001',
     title: 'Luxury Villa Pool',
-    client: 'Rajesh Sharma',
     clientId: 'CL001',
-    contractor: 'AquaTech Solutions',
+    clientName: 'Rajesh Sharma',
     contractorId: 'CT001',
+    contractorName: 'AquaTech Solutions',
     city: 'Mumbai',
     scope: 'Swimming Pool Construction',
     status: 'Under Construction',
     progress: 65,
+    statusColor: 'bg-green-500',
+    totalValue: '₹15,50,000',
     startDate: '2024-03-15',
-    endDate: '2024-07-15',
-    budget: '₹15,50,000',
-    description: 'Luxury residential swimming pool with infinity edge design, integrated spa, and LED lighting system.'
+    expectedCompletion: '2024-07-15',
+    lastUpdated: '2 hours ago'
   },
   {
     id: 'AQ002',
     title: 'Commercial Resort Pool',
-    client: 'Green Valley Resort',
     clientId: 'CL003',
-    contractor: 'Pool Masters Inc',
+    clientName: 'Green Valley Resort',
     contractorId: 'CT002',
+    contractorName: 'Pool Masters Inc',
     city: 'Goa',
     scope: 'Pool & Spa Complex',
-    status: 'Planning',
+    status: 'Quotation Sent',
     progress: 10,
+    statusColor: 'bg-blue-500',
+    totalValue: '₹45,80,000',
     startDate: '2024-06-01',
-    endDate: '2024-12-15',
-    budget: '₹45,80,000',
-    description: 'Large commercial resort pool complex with multiple pools, water features, and spa facilities.'
+    expectedCompletion: '2024-12-15',
+    lastUpdated: '1 day ago'
   },
   {
     id: 'AQ003',
     title: 'Residential Pool Project',
-    client: 'Priya Patel',
     clientId: 'CL002',
-    contractor: 'Elite Pools',
+    clientName: 'Priya Patel',
     contractorId: 'CT003',
+    contractorName: 'Elite Pools',
     city: 'Pune',
     scope: 'Swimming Pool',
     status: 'Completed',
     progress: 100,
+    statusColor: 'bg-purple-500',
+    totalValue: '₹8,25,000',
     startDate: '2024-01-10',
-    endDate: '2024-04-30',
-    budget: '₹8,25,000',
-    description: 'Modern residential swimming pool with automated cleaning system and energy-efficient heating.'
+    expectedCompletion: '2024-04-30',
+    lastUpdated: '1 week ago'
   }
 ];
 
-// Store management functions
-export class DataStore {
-  private static clients: Client[] = [...initialClients];
-  private static contractors: Contractor[] = [...initialContractors];
-  private static projects: Project[] = [...initialProjects];
+// Store state
+let clients: Client[] = [...initialClients];
+let contractors: Contractor[] = [...initialContractors];
+let projects: Project[] = [...initialProjects];
+let documents: Document[] = [];
 
-  // Client methods
-  static getClients(): Client[] {
-    return [...this.clients];
-  }
+// Client functions
+export function getClients(): Client[] {
+  return [...clients];
+}
 
-  static addClient(client: Omit<Client, 'id' | 'projectsCount' | 'totalValue'>): Client {
-    const newClient: Client = {
-      ...client,
-      id: `CL${String(this.clients.length + 1).padStart(3, '0')}`,
-      projectsCount: 0,
-      totalValue: '₹0'
-    };
-    this.clients.push(newClient);
-    return newClient;
-  }
+export function addClient(client: Omit<Client, 'id' | 'projectsCount' | 'totalValue'>): Client {
+  const newClient: Client = {
+    ...client,
+    id: `CL${String(clients.length + 1).padStart(3, '0')}`,
+    projectsCount: 0,
+    totalValue: '₹0'
+  };
+  clients.push(newClient);
+  return newClient;
+}
 
-  static updateClient(id: string, updates: Partial<Client>): Client | null {
-    const index = this.clients.findIndex(client => client.id === id);
-    if (index !== -1) {
-      this.clients[index] = { ...this.clients[index], ...updates };
-      return this.clients[index];
-    }
-    return null;
+export function updateClient(id: string, updates: Partial<Client>): Client | null {
+  const index = clients.findIndex(client => client.id === id);
+  if (index !== -1) {
+    clients[index] = { ...clients[index], ...updates };
+    return clients[index];
   }
+  return null;
+}
 
-  static deleteClient(id: string): boolean {
-    const index = this.clients.findIndex(client => client.id === id);
-    if (index !== -1) {
-      this.clients.splice(index, 1);
-      return true;
-    }
-    return false;
+export function deleteClient(id: string): boolean {
+  const index = clients.findIndex(client => client.id === id);
+  if (index !== -1) {
+    clients.splice(index, 1);
+    return true;
   }
+  return false;
+}
 
-  static getClientById(id: string): Client | null {
-    return this.clients.find(client => client.id === id) || null;
-  }
+export function getClientById(id: string): Client | null {
+  return clients.find(client => client.id === id) || null;
+}
 
-  // Contractor methods
-  static getContractors(): Contractor[] {
-    return [...this.contractors];
-  }
+// Contractor functions
+export function getContractors(): Contractor[] {
+  return [...contractors];
+}
 
-  static addContractor(contractor: Omit<Contractor, 'id' | 'projectsCount' | 'rating'>): Contractor {
-    const newContractor: Contractor = {
-      ...contractor,
-      id: `CT${String(this.contractors.length + 1).padStart(3, '0')}`,
-      projectsCount: 0,
-      rating: 0
-    };
-    this.contractors.push(newContractor);
-    return newContractor;
-  }
+export function addContractor(contractor: Omit<Contractor, 'id' | 'projectsCount' | 'rating'>): Contractor {
+  const newContractor: Contractor = {
+    ...contractor,
+    id: `CT${String(contractors.length + 1).padStart(3, '0')}`,
+    projectsCount: 0,
+    rating: 0
+  };
+  contractors.push(newContractor);
+  return newContractor;
+}
 
-  static updateContractor(id: string, updates: Partial<Contractor>): Contractor | null {
-    const index = this.contractors.findIndex(contractor => contractor.id === id);
-    if (index !== -1) {
-      this.contractors[index] = { ...this.contractors[index], ...updates };
-      return this.contractors[index];
-    }
-    return null;
+export function updateContractor(id: string, updates: Partial<Contractor>): Contractor | null {
+  const index = contractors.findIndex(contractor => contractor.id === id);
+  if (index !== -1) {
+    contractors[index] = { ...contractors[index], ...updates };
+    return contractors[index];
   }
+  return null;
+}
 
-  static deleteContractor(id: string): boolean {
-    const index = this.contractors.findIndex(contractor => contractor.id === id);
-    if (index !== -1) {
-      this.contractors.splice(index, 1);
-      return true;
-    }
-    return false;
+export function deleteContractor(id: string): boolean {
+  const index = contractors.findIndex(contractor => contractor.id === id);
+  if (index !== -1) {
+    contractors.splice(index, 1);
+    return true;
   }
+  return false;
+}
 
-  static getContractorById(id: string): Contractor | null {
-    return this.contractors.find(contractor => contractor.id === id) || null;
-  }
+export function getContractorById(id: string): Contractor | null {
+  return contractors.find(contractor => contractor.id === id) || null;
+}
 
-  // Project methods
-  static getProjects(): Project[] {
-    return [...this.projects];
-  }
+// Project functions
+export function getProjects(): Project[] {
+  return [...projects];
+}
 
-  static addProject(project: Omit<Project, 'id'>): Project {
-    const newProject: Project = {
-      ...project,
-      id: `AQ${String(this.projects.length + 1).padStart(3, '0')}`
-    };
-    this.projects.push(newProject);
-    this.updateClientProjectCount(project.clientId);
-    this.updateContractorProjectCount(project.contractorId);
-    return newProject;
-  }
+export function addProject(project: Omit<Project, 'id'>): Project {
+  const newProject: Project = {
+    ...project,
+    id: `AQ${String(projects.length + 1).padStart(3, '0')}`
+  };
+  projects.push(newProject);
+  updateClientProjectCount(project.clientId);
+  updateContractorProjectCount(project.contractorId);
+  return newProject;
+}
 
-  static updateProject(id: string, updates: Partial<Project>): Project | null {
-    const index = this.projects.findIndex(project => project.id === id);
-    if (index !== -1) {
-      this.projects[index] = { ...this.projects[index], ...updates };
-      return this.projects[index];
-    }
-    return null;
+export function updateProject(id: string, updates: Partial<Project>): Project | null {
+  const index = projects.findIndex(project => project.id === id);
+  if (index !== -1) {
+    projects[index] = { ...projects[index], ...updates };
+    return projects[index];
   }
+  return null;
+}
 
-  static deleteProject(id: string): boolean {
-    const project = this.projects.find(p => p.id === id);
-    if (project) {
-      const index = this.projects.findIndex(p => p.id === id);
-      this.projects.splice(index, 1);
-      this.updateClientProjectCount(project.clientId);
-      this.updateContractorProjectCount(project.contractorId);
-      return true;
-    }
-    return false;
+export function deleteProject(id: string): boolean {
+  const project = projects.find(p => p.id === id);
+  if (project) {
+    const index = projects.findIndex(p => p.id === id);
+    projects.splice(index, 1);
+    updateClientProjectCount(project.clientId);
+    updateContractorProjectCount(project.contractorId);
+    return true;
   }
+  return false;
+}
 
-  static getProjectById(id: string): Project | null {
-    return this.projects.find(project => project.id === id) || null;
-  }
+export function getProjectById(id: string): Project | null {
+  return projects.find(project => project.id === id) || null;
+}
 
-  // Helper methods for updating counts
-  private static updateClientProjectCount(clientId: string): void {
-    const client = this.clients.find(c => c.id === clientId);
-    if (client) {
-      const projectCount = this.projects.filter(p => p.clientId === clientId).length;
-      client.projectsCount = projectCount;
-    }
-  }
+// Document functions
+export function getDocuments(): Document[] {
+  return [...documents];
+}
 
-  private static updateContractorProjectCount(contractorId: string): void {
-    const contractor = this.contractors.find(c => c.id === contractorId);
-    if (contractor) {
-      const projectCount = this.projects.filter(p => p.contractorId === contractorId).length;
-      contractor.projectsCount = projectCount;
-    }
-  }
+export function addDocument(document: Omit<Document, 'id'>): Document {
+  const newDocument: Document = {
+    ...document,
+    id: `DOC${String(documents.length + 1).padStart(3, '0')}`
+  };
+  documents.push(newDocument);
+  return newDocument;
+}
 
-  // View details methods (for the eye icon functionality)
-  static viewClientDetails(id: string): Client | null {
-    return this.getClientById(id);
+export function deleteDocument(id: string): boolean {
+  const index = documents.findIndex(doc => doc.id === id);
+  if (index !== -1) {
+    documents.splice(index, 1);
+    return true;
   }
+  return false;
+}
 
-  static viewContractorDetails(id: string): Contractor | null {
-    return this.getContractorById(id);
+// Helper functions
+function updateClientProjectCount(clientId: string): void {
+  const client = clients.find(c => c.id === clientId);
+  if (client) {
+    const projectCount = projects.filter(p => p.clientId === clientId).length;
+    client.projectsCount = projectCount;
   }
+}
 
-  static viewProjectDetails(id: string): Project | null {
-    return this.getProjectById(id);
+function updateContractorProjectCount(contractorId: string): void {
+  const contractor = contractors.find(c => c.id === contractorId);
+  if (contractor) {
+    const projectCount = projects.filter(p => p.contractorId === contractorId).length;
+    contractor.projectsCount = projectCount;
   }
+}
+
+// Export data for components
+export function exportData() {
+  return {
+    clients: getClients(),
+    contractors: getContractors(),
+    projects: getProjects(),
+    documents: getDocuments()
+  };
+}
+
+export function importData(data: any) {
+  if (data.clients) clients = data.clients;
+  if (data.contractors) contractors = data.contractors;
+  if (data.projects) projects = data.projects;
+  if (data.documents) documents = data.documents;
 }

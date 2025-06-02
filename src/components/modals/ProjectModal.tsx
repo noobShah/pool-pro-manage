@@ -18,10 +18,10 @@ interface ProjectModalProps {
 export const ProjectModal = ({ isOpen, onClose, onSave, project, mode }: ProjectModalProps) => {
   const [formData, setFormData] = useState({
     title: '',
-    clientId: 0,
+    clientId: '',
     clientName: '',
     city: '',
-    contractorId: 0,
+    contractorId: '',
     contractorName: '',
     status: 'Quotation Sent' as 'Quotation Sent' | 'Under Construction' | 'Completed' | 'On Hold',
     scope: '',
@@ -55,10 +55,10 @@ export const ProjectModal = ({ isOpen, onClose, onSave, project, mode }: Project
     } else {
       setFormData({
         title: '',
-        clientId: 0,
+        clientId: '',
         clientName: '',
         city: '',
-        contractorId: 0,
+        contractorId: '',
         contractorName: '',
         status: 'Quotation Sent',
         scope: '',
@@ -82,7 +82,7 @@ export const ProjectModal = ({ isOpen, onClose, onSave, project, mode }: Project
   };
 
   const handleClientChange = (clientId: string) => {
-    const client = clients.find(c => c.id === parseInt(clientId));
+    const client = clients.find(c => c.id === clientId);
     if (client) {
       setFormData(prev => ({
         ...prev,
@@ -94,7 +94,7 @@ export const ProjectModal = ({ isOpen, onClose, onSave, project, mode }: Project
   };
 
   const handleContractorChange = (contractorId: string) => {
-    const contractor = contractors.find(c => c.id === parseInt(contractorId));
+    const contractor = contractors.find(c => c.id === contractorId);
     if (contractor) {
       setFormData(prev => ({
         ...prev,
@@ -137,13 +137,13 @@ export const ProjectModal = ({ isOpen, onClose, onSave, project, mode }: Project
           
           <div className="space-y-2">
             <Label htmlFor="client">Client</Label>
-            <Select value={formData.clientId.toString()} onValueChange={handleClientChange}>
+            <Select value={formData.clientId} onValueChange={handleClientChange}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a client" />
               </SelectTrigger>
               <SelectContent>
                 {clients.map((client) => (
-                  <SelectItem key={client.id} value={client.id.toString()}>
+                  <SelectItem key={client.id} value={client.id}>
                     {client.name}
                   </SelectItem>
                 ))}
@@ -153,13 +153,13 @@ export const ProjectModal = ({ isOpen, onClose, onSave, project, mode }: Project
 
           <div className="space-y-2">
             <Label htmlFor="contractor">Contractor</Label>
-            <Select value={formData.contractorId.toString()} onValueChange={handleContractorChange}>
+            <Select value={formData.contractorId} onValueChange={handleContractorChange}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a contractor" />
               </SelectTrigger>
               <SelectContent>
                 {contractors.map((contractor) => (
-                  <SelectItem key={contractor.id} value={contractor.id.toString()}>
+                  <SelectItem key={contractor.id} value={contractor.id}>
                     {contractor.name}
                   </SelectItem>
                 ))}
