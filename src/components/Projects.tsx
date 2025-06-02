@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,81 +13,85 @@ import {
   MapPin, 
   User, 
   Calendar,
-  Eye
+  Eye,
+  Edit,
+  Trash2
 } from 'lucide-react';
-
-const projectsData = [
-  {
-    id: 'AQ001',
-    title: 'Luxury Villa Pool',
-    client: 'Rajesh Sharma',
-    city: 'Mumbai',
-    contractor: 'AquaTech Solutions',
-    status: 'Under Construction',
-    scope: 'Infinity Pool + Deck',
-    lastUpdated: '2 days ago',
-    progress: 65,
-    statusColor: 'bg-green-500'
-  },
-  {
-    id: 'AQ002',
-    title: 'Commercial Resort Pool',
-    client: 'Green Valley Resort',
-    city: 'Pune',
-    contractor: 'Pool Masters Inc',
-    status: 'Quotation Sent',
-    scope: 'Olympic Size Pool',
-    lastUpdated: '1 week ago',
-    progress: 10,
-    statusColor: 'bg-blue-500'
-  },
-  {
-    id: 'AQ003',
-    title: 'Residential Pool Project',
-    client: 'Priya Patel',
-    city: 'Nashik',
-    contractor: 'AquaBuild Pro',
-    status: 'Completed',
-    scope: 'Standard Pool + Jacuzzi',
-    lastUpdated: '3 days ago',
-    progress: 100,
-    statusColor: 'bg-purple-500'
-  },
-  {
-    id: 'AQ004',
-    title: 'Hotel Chain Pool',
-    client: 'Horizon Hotels',
-    city: 'Aurangabad',
-    contractor: 'Elite Pools',
-    status: 'On Hold',
-    scope: 'Rooftop Pool + Bar',
-    lastUpdated: '5 days ago',
-    progress: 25,
-    statusColor: 'bg-yellow-500'
-  },
-];
+import { ProjectModal } from './modals/ProjectModal';
+import { getProjects, addProject, updateProject, deleteProject, Project } from '../data/store';
+import { useToast } from '@/hooks/use-toast';
 
 export const Projects = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterCity, setFilterCity] = useState('all');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | undefined>();
+  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+  const [projects, setProjects] = useState(getProjects());
+  const { toast } = useToast();
 
-  const filteredProjects = projectsData.filter(project => {
+  const filteredProjects = projects.filter(project => {
     const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         project.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         project.contractor.toLowerCase().includes(searchQuery.toLowerCase());
+                         project.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         project.contractorName.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = filterStatus === 'all' || project.status === filterStatus;
     const matchesCity = filterCity === 'all' || project.city === filterCity;
     
     return matchesSearch && matchesStatus && matchesCity;
   });
 
+  const handleAddProject = () => {
+    setSelectedProject(undefined);
+    setModalMode('add');
+    setIsModalOpen(true);
+  };
+
+  const handleEditProject = (project: Project) => {
+    setSelectedProject(project);
+    setModalMode('edit');
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteProject = (project: Project) => {
+    if (window.confirm(`Are you sure you want to delete ${project.title}?`)) {
+      deleteProject(project.id);
+      setProjects(getProjects());
+      toast({
+        title: "Project deleted",
+        description: `${project.title} has been removed successfully.`,
+      });
+    }
+  };
+
+  const handleSaveProject = (projectData: Omit<Project, 'id' | 'lastUpdated'>) => {
+    const projectWithTimestamp = {
+      ...projectData,
+      lastUpdated: 'Just now'
+    };
+
+    if (modalMode === 'add') {
+      const newProject = addProject(projectWithTimestamp);
+      toast({
+        title: "Project added",
+        description: `${newProject.title} has been added successfully.`,
+      });
+    } else if (selectedProject) {
+      updateProject(selectedProject.id, projectWithTimestamp);
+      toast({
+        title: "Project updated",
+        description: `${projectData.title} has been updated successfully.`,
+      });
+    }
+    setProjects(getProjects());
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Projects</h1>
-        <Button className="bg-blue-600 hover:bg-blue-700">
+        <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleAddProject}>
           <Plus className="h-4 w-4 mr-2" />
           New Project
         </Button>
@@ -169,6 +172,24 @@ export const Projects = () => {
                   <Badge variant="outline" className="text-xs">
                     {project.id}
                   </Badge>
+                  <div className="flex gap-1">
+                    <Button variant="ghost" size="sm" onClick={() => handleEditProject(project)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm">
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleDeleteProject(project)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
                   <Badge 
                     className={`${project.statusColor} text-white`}
                   >
@@ -181,7 +202,7 @@ export const Projects = () => {
                 <div className="space-y-2">
                   <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                     <User className="h-4 w-4 mr-2" />
-                    {project.client}
+                    {project.clientName}
                   </div>
                   <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                     <MapPin className="h-4 w-4 mr-2" />
@@ -208,12 +229,12 @@ export const Projects = () => {
 
                 <div className="pt-2">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">{project.scope}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Contractor: {project.contractor}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Contractor: {project.contractorName}</p>
                 </div>
 
-                <Button variant="outline" className="w-full">
-                  <Eye className="h-4 w-4 mr-2" />
-                  View Details
+                <Button variant="outline" className="w-full" onClick={() => handleEditProject(project)}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Project
                 </Button>
               </CardContent>
             </Card>
@@ -260,7 +281,7 @@ export const Projects = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                        {project.client}
+                        {project.clientName}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                         {project.city}
@@ -294,6 +315,14 @@ export const Projects = () => {
           </CardContent>
         </Card>
       )}
+
+      <ProjectModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveProject}
+        project={selectedProject}
+        mode={modalMode}
+      />
     </div>
   );
 };

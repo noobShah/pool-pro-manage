@@ -13,64 +13,70 @@ import {
   MapPin, 
   FolderOpen,
   Eye,
-  Edit
+  Edit,
+  Trash2
 } from 'lucide-react';
-
-const clientsData = [
-  {
-    id: 1,
-    name: 'Rajesh Sharma',
-    email: 'rajesh.sharma@email.com',
-    phone: '+91 98765 43210',
-    city: 'Mumbai',
-    address: 'Bandra West, Mumbai',
-    projectsCount: 2,
-    totalValue: '₹15,50,000',
-    status: 'Active'
-  },
-  {
-    id: 2,
-    name: 'Priya Patel',
-    email: 'priya.patel@email.com',
-    phone: '+91 87654 32109',
-    city: 'Pune',
-    address: 'Koregaon Park, Pune',
-    projectsCount: 1,
-    totalValue: '₹8,25,000',
-    status: 'Active'
-  },
-  {
-    id: 3,
-    name: 'Green Valley Resort',
-    email: 'info@greenvalley.com',
-    phone: '+91 76543 21098',
-    city: 'Nashik',
-    address: 'Nashik-Pune Highway',
-    projectsCount: 3,
-    totalValue: '₹45,80,000',
-    status: 'Premium'
-  },
-  {
-    id: 4,
-    name: 'Amit Kumar',
-    email: 'amit.kumar@email.com',
-    phone: '+91 65432 10987',
-    city: 'Aurangabad',
-    address: 'CIDCO Area, Aurangabad',
-    projectsCount: 1,
-    totalValue: '₹12,30,000',
-    status: 'Active'
-  },
-];
+import { ClientModal } from './modals/ClientModal';
+import { getClients, addClient, updateClient, deleteClient, Client } from '../data/store';
+import { useToast } from '@/hooks/use-toast';
 
 export const Clients = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<Client | undefined>();
+  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+  const [clients, setClients] = useState(getClients());
+  const { toast } = useToast();
 
-  const filteredClients = clientsData.filter(client =>
+  const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     client.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     client.city.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleAddClient = () => {
+    setSelectedClient(undefined);
+    setModalMode('add');
+    setIsModalOpen(true);
+  };
+
+  const handleEditClient = (client: Client) => {
+    setSelectedClient(client);
+    setModalMode('edit');
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteClient = (client: Client) => {
+    if (window.confirm(`Are you sure you want to delete ${client.name}?`)) {
+      deleteClient(client.id);
+      setClients(getClients());
+      toast({
+        title: "Client deleted",
+        description: `${client.name} has been removed successfully.`,
+      });
+    }
+  };
+
+  const handleSaveClient = (clientData: Omit<Client, 'id' | 'projectsCount' | 'totalValue'>) => {
+    if (modalMode === 'add') {
+      const newClient = addClient({
+        ...clientData,
+        projectsCount: 0,
+        totalValue: '₹0'
+      });
+      toast({
+        title: "Client added",
+        description: `${newClient.name} has been added successfully.`,
+      });
+    } else if (selectedClient) {
+      updateClient(selectedClient.id, clientData);
+      toast({
+        title: "Client updated",
+        description: `${clientData.name} has been updated successfully.`,
+      });
+    }
+    setClients(getClients());
+  };
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
@@ -88,7 +94,7 @@ export const Clients = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Clients</h1>
-        <Button className="bg-blue-600 hover:bg-blue-700">
+        <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleAddClient}>
           <Plus className="h-4 w-4 mr-2" />
           Add Client
         </Button>
@@ -120,11 +126,19 @@ export const Clients = () => {
                   {client.status}
                 </Badge>
                 <div className="flex gap-1">
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" onClick={() => handleEditClient(client)}>
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button variant="ghost" size="sm">
                     <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleDeleteClient(client)}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
@@ -174,6 +188,14 @@ export const Clients = () => {
           </Card>
         ))}
       </div>
+
+      <ClientModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveClient}
+        client={selectedClient}
+        mode={modalMode}
+      />
     </div>
   );
 };

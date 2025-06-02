@@ -14,64 +14,69 @@ import {
   FolderOpen,
   Star,
   Eye,
-  Edit
+  Edit,
+  Trash2
 } from 'lucide-react';
-
-const contractorsData = [
-  {
-    id: 1,
-    name: 'AquaTech Solutions',
-    email: 'contact@aquatech.com',
-    phone: '+91 98765 43210',
-    gstNumber: '27ABCDE1234F1Z5',
-    specialization: 'Infinity Pools',
-    projectsCount: 8,
-    rating: 4.8,
-    status: 'Verified'
-  },
-  {
-    id: 2,
-    name: 'Pool Masters Inc',
-    email: 'info@poolmasters.com',
-    phone: '+91 87654 32109',
-    gstNumber: '27FGHIJ5678K2Y4',
-    specialization: 'Commercial Pools',
-    projectsCount: 5,
-    rating: 4.6,
-    status: 'Verified'
-  },
-  {
-    id: 3,
-    name: 'Elite Pools',
-    email: 'hello@elitepools.com',
-    phone: '+91 76543 21098',
-    gstNumber: '27LMNOP9012M3X7',
-    specialization: 'Luxury Resorts',
-    projectsCount: 12,
-    rating: 4.9,
-    status: 'Premium'
-  },
-  {
-    id: 4,
-    name: 'AquaBuild Pro',
-    email: 'team@aquabuild.com',
-    phone: '+91 65432 10987',
-    gstNumber: '27QRSTU3456N4W8',
-    specialization: 'Residential Pools',
-    projectsCount: 3,
-    rating: 4.4,
-    status: 'Active'
-  },
-];
+import { ContractorModal } from './modals/ContractorModal';
+import { getContractors, addContractor, updateContractor, deleteContractor, Contractor } from '../data/store';
+import { useToast } from '@/hooks/use-toast';
 
 export const Contractors = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedContractor, setSelectedContractor] = useState<Contractor | undefined>();
+  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+  const [contractors, setContractors] = useState(getContractors());
+  const { toast } = useToast();
 
-  const filteredContractors = contractorsData.filter(contractor =>
+  const filteredContractors = contractors.filter(contractor =>
     contractor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     contractor.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     contractor.specialization.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleAddContractor = () => {
+    setSelectedContractor(undefined);
+    setModalMode('add');
+    setIsModalOpen(true);
+  };
+
+  const handleEditContractor = (contractor: Contractor) => {
+    setSelectedContractor(contractor);
+    setModalMode('edit');
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteContractor = (contractor: Contractor) => {
+    if (window.confirm(`Are you sure you want to delete ${contractor.name}?`)) {
+      deleteContractor(contractor.id);
+      setContractors(getContractors());
+      toast({
+        title: "Contractor deleted",
+        description: `${contractor.name} has been removed successfully.`,
+      });
+    }
+  };
+
+  const handleSaveContractor = (contractorData: Omit<Contractor, 'id' | 'projectsCount'>) => {
+    if (modalMode === 'add') {
+      const newContractor = addContractor({
+        ...contractorData,
+        projectsCount: 0
+      });
+      toast({
+        title: "Contractor added",
+        description: `${newContractor.name} has been added successfully.`,
+      });
+    } else if (selectedContractor) {
+      updateContractor(selectedContractor.id, contractorData);
+      toast({
+        title: "Contractor updated",
+        description: `${contractorData.name} has been updated successfully.`,
+      });
+    }
+    setContractors(getContractors());
+  };
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
@@ -103,7 +108,7 @@ export const Contractors = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Contractors</h1>
-        <Button className="bg-blue-600 hover:bg-blue-700">
+        <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleAddContractor}>
           <Plus className="h-4 w-4 mr-2" />
           Add Contractor
         </Button>
@@ -135,11 +140,19 @@ export const Contractors = () => {
                   {contractor.status}
                 </Badge>
                 <div className="flex gap-1">
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" onClick={() => handleEditContractor(contractor)}>
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button variant="ghost" size="sm">
                     <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleDeleteContractor(contractor)}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
@@ -192,6 +205,14 @@ export const Contractors = () => {
           </Card>
         ))}
       </div>
+
+      <ContractorModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveContractor}
+        contractor={selectedContractor}
+        mode={modalMode}
+      />
     </div>
   );
 };
