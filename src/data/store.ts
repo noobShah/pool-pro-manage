@@ -1,4 +1,3 @@
-
 export interface Client {
   id: string;
   name: string;
@@ -18,7 +17,7 @@ export interface Contractor {
   phone: string;
   gstNumber: string;
   specialization: string;
-  status: 'Active' | 'Inactive';
+  status: 'Active' | 'Inactive' | 'Verified' | 'Premium';
   projectsCount: number;
   rating: number;
 }
