@@ -16,8 +16,10 @@ export const Layout = () => {
           <Sidebar />
           <div className={`flex-1 flex flex-col ${isMobile ? 'ml-0' : ''}`}>
             <Header />
-            <main className={`flex-1 p-3 md:p-6 bg-gray-50 dark:bg-gray-900/50 ${isMobile ? 'pt-20' : ''}`}>
-              <Outlet />
+            <main className={`flex-1 p-2 md:p-6 bg-gray-50 dark:bg-gray-900/50 ${isMobile ? 'pt-20' : ''}`}>
+              <div className="max-w-full">
+                <Outlet />
+              </div>
             </main>
           </div>
         </div>

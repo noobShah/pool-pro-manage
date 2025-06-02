@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,12 +18,14 @@ import {
   Trash2
 } from 'lucide-react';
 import { ContractorModal } from './modals/ContractorModal';
+import { ContractorDetailModal } from './modals/ContractorDetailModal';
 import { getContractors, addContractor, updateContractor, deleteContractor, Contractor } from '../data/store';
 import { useToast } from '@/hooks/use-toast';
 
 export const Contractors = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedContractor, setSelectedContractor] = useState<Contractor | undefined>();
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [contractors, setContractors] = useState(getContractors());
@@ -44,6 +47,11 @@ export const Contractors = () => {
     setSelectedContractor(contractor);
     setModalMode('edit');
     setIsModalOpen(true);
+  };
+
+  const handleViewContractor = (contractor: Contractor) => {
+    setSelectedContractor(contractor);
+    setIsDetailModalOpen(true);
   };
 
   const handleDeleteContractor = (contractor: Contractor) => {
@@ -91,7 +99,7 @@ export const Contractors = () => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
-        className={`h-4 w-4 ${
+        className={`h-3 w-3 md:h-4 md:w-4 ${
           i < Math.floor(rating) 
             ? 'text-yellow-400 fill-current' 
             : 'text-gray-300 dark:text-gray-600'
@@ -101,10 +109,10 @@ export const Contractors = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Contractors</h1>
-        <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleAddContractor}>
+    <div className="space-y-4 md:space-y-6 p-2 md:p-0">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Contractors</h1>
+        <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto" onClick={handleAddContractor}>
           <Plus className="h-4 w-4 mr-2" />
           Add Contractor
         </Button>
@@ -112,7 +120,7 @@ export const Contractors = () => {
 
       {/* Search */}
       <Card>
-        <CardContent className="p-4">
+        <CardContent className="p-3 md:p-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
@@ -127,7 +135,7 @@ export const Contractors = () => {
       </Card>
 
       {/* Contractors Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {filteredContractors.map((contractor) => (
           <Card key={contractor.id} className="hover:shadow-lg transition-shadow">
             <CardHeader className="pb-3">
@@ -139,7 +147,7 @@ export const Contractors = () => {
                   <Button variant="ghost" size="sm" onClick={() => handleEditContractor(contractor)}>
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" onClick={() => handleViewContractor(contractor)}>
                     <Eye className="h-4 w-4" />
                   </Button>
                   <Button 
@@ -155,45 +163,45 @@ export const Contractors = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-3">
-                <Avatar className="h-12 w-12">
-                  <AvatarFallback className="bg-green-100 text-green-600 font-medium">
+                <Avatar className="h-10 w-10 md:h-12 md:w-12">
+                  <AvatarFallback className="bg-green-100 text-green-600 font-medium text-sm md:text-base">
                     {getInitials(contractor.name)}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{contractor.name}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{contractor.specialization}</p>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-gray-900 dark:text-white text-sm md:text-base truncate">{contractor.name}</h3>
+                  <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 truncate">{contractor.specialization}</p>
                 </div>
               </div>
 
               <div className="flex items-center space-x-1">
                 {renderStars(contractor.rating)}
-                <span className="text-sm font-medium text-gray-600 dark:text-gray-400 ml-2">
+                <span className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400 ml-2">
                   {contractor.rating}
                 </span>
               </div>
 
               <div className="space-y-2">
-                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                  <Mail className="h-4 w-4 mr-2 flex-shrink-0" />
+                <div className="flex items-center text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                  <Mail className="h-3 w-3 md:h-4 md:w-4 mr-2 flex-shrink-0" />
                   <span className="truncate">{contractor.email}</span>
                 </div>
-                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                  <Phone className="h-4 w-4 mr-2 flex-shrink-0" />
-                  {contractor.phone}
+                <div className="flex items-center text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                  <Phone className="h-3 w-3 md:h-4 md:w-4 mr-2 flex-shrink-0" />
+                  <span className="truncate">{contractor.phone}</span>
                 </div>
-                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                  <FileText className="h-4 w-4 mr-2 flex-shrink-0" />
+                <div className="flex items-center text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                  <FileText className="h-3 w-3 md:h-4 md:w-4 mr-2 flex-shrink-0" />
                   <span className="truncate">{contractor.gstNumber}</span>
                 </div>
               </div>
 
               <div className="border-t pt-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Active Projects</span>
+                  <span className="text-xs md:text-sm text-gray-600 dark:text-gray-400">Active Projects</span>
                   <div className="flex items-center">
-                    <FolderOpen className="h-4 w-4 mr-1 text-blue-600" />
-                    <span className="font-semibold text-gray-900 dark:text-white">{contractor.projectsCount}</span>
+                    <FolderOpen className="h-3 w-3 md:h-4 md:w-4 mr-1 text-blue-600" />
+                    <span className="font-semibold text-gray-900 dark:text-white text-sm">{contractor.projectsCount}</span>
                   </div>
                 </div>
               </div>
@@ -208,6 +216,12 @@ export const Contractors = () => {
         onSave={handleSaveContractor}
         contractor={selectedContractor}
         mode={modalMode}
+      />
+
+      <ContractorDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        contractor={selectedContractor || null}
       />
     </div>
   );
