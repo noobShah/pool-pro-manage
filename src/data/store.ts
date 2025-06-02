@@ -1,362 +1,319 @@
 
 export interface Client {
-  id: number;
+  id: string;
   name: string;
   email: string;
   phone: string;
   city: string;
   address: string;
+  status: 'Active' | 'Premium' | 'Inactive';
   projectsCount: number;
   totalValue: string;
-  status: 'Active' | 'Premium' | 'Inactive';
 }
 
 export interface Contractor {
-  id: number;
+  id: string;
   name: string;
   email: string;
   phone: string;
   gstNumber: string;
   specialization: string;
+  status: 'Active' | 'Inactive';
   projectsCount: number;
   rating: number;
-  status: 'Verified' | 'Premium' | 'Active' | 'Inactive';
 }
 
 export interface Project {
   id: string;
   title: string;
-  clientId: number;
-  clientName: string;
+  client: string;
+  clientId: string;
+  contractor: string;
+  contractorId: string;
   city: string;
-  contractorId: number;
-  contractorName: string;
-  status: 'Quotation Sent' | 'Under Construction' | 'Completed' | 'On Hold';
   scope: string;
-  lastUpdated: string;
+  status: 'Planning' | 'Under Construction' | 'Completed' | 'On Hold';
   progress: number;
-  statusColor: string;
-  totalValue?: string;
-  startDate?: string;
-  expectedCompletion?: string;
+  startDate: string;
+  endDate: string;
+  budget: string;
+  description: string;
 }
 
 // Initial data
-export let clients: Client[] = [
+export const initialClients: Client[] = [
   {
-    id: 1,
+    id: 'CL001',
     name: 'Rajesh Sharma',
     email: 'rajesh.sharma@email.com',
     phone: '+91 98765 43210',
     city: 'Mumbai',
-    address: 'Bandra West, Mumbai',
+    address: '123 Marine Drive, Mumbai, Maharashtra 400001',
+    status: 'Active',
     projectsCount: 2,
-    totalValue: '₹15,50,000',
-    status: 'Active'
+    totalValue: '₹25,50,000'
   },
   {
-    id: 2,
+    id: 'CL002',
     name: 'Priya Patel',
     email: 'priya.patel@email.com',
     phone: '+91 87654 32109',
     city: 'Pune',
-    address: 'Koregaon Park, Pune',
+    address: '456 FC Road, Pune, Maharashtra 411005',
+    status: 'Premium',
     projectsCount: 1,
-    totalValue: '₹8,25,000',
-    status: 'Active'
+    totalValue: '₹8,25,000'
   },
   {
-    id: 3,
+    id: 'CL003',
     name: 'Green Valley Resort',
-    email: 'info@greenvalley.com',
+    email: 'booking@greenvalley.com',
     phone: '+91 76543 21098',
-    city: 'Nashik',
-    address: 'Nashik-Pune Highway',
-    projectsCount: 3,
-    totalValue: '₹45,80,000',
-    status: 'Premium'
-  },
-  {
-    id: 4,
-    name: 'Amit Kumar',
-    email: 'amit.kumar@email.com',
-    phone: '+91 65432 10987',
-    city: 'Aurangabad',
-    address: 'CIDCO Area, Aurangabad',
+    city: 'Goa',
+    address: '789 Beach Road, Goa 403516',
+    status: 'Active',
     projectsCount: 1,
-    totalValue: '₹12,30,000',
-    status: 'Active'
-  },
+    totalValue: '₹45,80,000'
+  }
 ];
 
-export let contractors: Contractor[] = [
+export const initialContractors: Contractor[] = [
   {
-    id: 1,
+    id: 'CT001',
     name: 'AquaTech Solutions',
-    email: 'contact@aquatech.com',
-    phone: '+91 98765 43210',
+    email: 'info@aquatech.com',
+    phone: '+91 99887 76655',
     gstNumber: '27ABCDE1234F1Z5',
-    specialization: 'Infinity Pools',
-    projectsCount: 8,
-    rating: 4.8,
-    status: 'Verified'
-  },
-  {
-    id: 2,
-    name: 'Pool Masters Inc',
-    email: 'info@poolmasters.com',
-    phone: '+91 87654 32109',
-    gstNumber: '27FGHIJ5678K2Y4',
-    specialization: 'Commercial Pools',
+    specialization: 'Residential Pools',
+    status: 'Active',
     projectsCount: 5,
-    rating: 4.6,
-    status: 'Verified'
+    rating: 4.8
   },
   {
-    id: 3,
+    id: 'CT002',
+    name: 'Pool Masters Inc',
+    email: 'contact@poolmasters.com',
+    phone: '+91 88776 65544',
+    gstNumber: '27FGHIJ5678K2L6',
+    specialization: 'Commercial Pools',
+    status: 'Active',
+    projectsCount: 3,
+    rating: 4.6
+  },
+  {
+    id: 'CT003',
     name: 'Elite Pools',
     email: 'hello@elitepools.com',
-    phone: '+91 76543 21098',
-    gstNumber: '27LMNOP9012M3X7',
-    specialization: 'Luxury Resorts',
-    projectsCount: 12,
-    rating: 4.9,
-    status: 'Premium'
-  },
-  {
-    id: 4,
-    name: 'AquaBuild Pro',
-    email: 'team@aquabuild.com',
-    phone: '+91 65432 10987',
-    gstNumber: '27QRSTU3456N4W8',
-    specialization: 'Residential Pools',
-    projectsCount: 3,
-    rating: 4.4,
-    status: 'Active'
-  },
+    phone: '+91 77665 54433',
+    gstNumber: '27MNOPQ9012R3S7',
+    specialization: 'Luxury Pools',
+    status: 'Active',
+    projectsCount: 8,
+    rating: 4.9
+  }
 ];
 
-export let projects: Project[] = [
+export const initialProjects: Project[] = [
   {
     id: 'AQ001',
     title: 'Luxury Villa Pool',
-    clientId: 1,
-    clientName: 'Rajesh Sharma',
+    client: 'Rajesh Sharma',
+    clientId: 'CL001',
+    contractor: 'AquaTech Solutions',
+    contractorId: 'CT001',
     city: 'Mumbai',
-    contractorId: 1,
-    contractorName: 'AquaTech Solutions',
+    scope: 'Swimming Pool Construction',
     status: 'Under Construction',
-    scope: 'Infinity Pool + Deck',
-    lastUpdated: '2 days ago',
     progress: 65,
-    statusColor: 'bg-green-500',
-    totalValue: '₹15,50,000',
-    startDate: '2024-04-15',
-    expectedCompletion: '2024-06-30'
+    startDate: '2024-03-15',
+    endDate: '2024-07-15',
+    budget: '₹15,50,000',
+    description: 'Luxury residential swimming pool with infinity edge design, integrated spa, and LED lighting system.'
   },
   {
     id: 'AQ002',
     title: 'Commercial Resort Pool',
-    clientId: 3,
-    clientName: 'Green Valley Resort',
-    city: 'Pune',
-    contractorId: 2,
-    contractorName: 'Pool Masters Inc',
-    status: 'Quotation Sent',
-    scope: 'Olympic Size Pool',
-    lastUpdated: '1 week ago',
+    client: 'Green Valley Resort',
+    clientId: 'CL003',
+    contractor: 'Pool Masters Inc',
+    contractorId: 'CT002',
+    city: 'Goa',
+    scope: 'Pool & Spa Complex',
+    status: 'Planning',
     progress: 10,
-    statusColor: 'bg-blue-500',
-    totalValue: '₹45,80,000'
+    startDate: '2024-06-01',
+    endDate: '2024-12-15',
+    budget: '₹45,80,000',
+    description: 'Large commercial resort pool complex with multiple pools, water features, and spa facilities.'
   },
   {
     id: 'AQ003',
     title: 'Residential Pool Project',
-    clientId: 2,
-    clientName: 'Priya Patel',
-    city: 'Nashik',
-    contractorId: 4,
-    contractorName: 'AquaBuild Pro',
+    client: 'Priya Patel',
+    clientId: 'CL002',
+    contractor: 'Elite Pools',
+    contractorId: 'CT003',
+    city: 'Pune',
+    scope: 'Swimming Pool',
     status: 'Completed',
-    scope: 'Standard Pool + Jacuzzi',
-    lastUpdated: '3 days ago',
     progress: 100,
-    statusColor: 'bg-purple-500',
-    totalValue: '₹8,25,000',
-    startDate: '2024-03-01',
-    expectedCompletion: '2024-05-15'
-  },
-  {
-    id: 'AQ004',
-    title: 'Hotel Chain Pool',
-    clientId: 4,
-    clientName: 'Amit Kumar',
-    city: 'Aurangabad',
-    contractorId: 3,
-    contractorName: 'Elite Pools',
-    status: 'On Hold',
-    scope: 'Rooftop Pool + Bar',
-    lastUpdated: '5 days ago',
-    progress: 25,
-    statusColor: 'bg-yellow-500',
-    totalValue: '₹12,30,000'
-  },
+    startDate: '2024-01-10',
+    endDate: '2024-04-30',
+    budget: '₹8,25,000',
+    description: 'Modern residential swimming pool with automated cleaning system and energy-efficient heating.'
+  }
 ];
 
-// CRUD operations for clients
-export const addClient = (client: Omit<Client, 'id'>) => {
-  const newId = Math.max(...clients.map(c => c.id)) + 1;
-  const newClient = { ...client, id: newId };
-  clients.push(newClient);
-  return newClient;
-};
+// Store management functions
+export class DataStore {
+  private static clients: Client[] = [...initialClients];
+  private static contractors: Contractor[] = [...initialContractors];
+  private static projects: Project[] = [...initialProjects];
 
-export const updateClient = (id: number, updates: Partial<Client>) => {
-  const index = clients.findIndex(c => c.id === id);
-  if (index !== -1) {
-    clients[index] = { ...clients[index], ...updates };
-    // Update related projects
-    projects.forEach(project => {
-      if (project.clientId === id) {
-        project.clientName = clients[index].name;
-      }
-    });
-    return clients[index];
+  // Client methods
+  static getClients(): Client[] {
+    return [...this.clients];
   }
-  return null;
-};
 
-export const deleteClient = (id: number) => {
-  const index = clients.findIndex(c => c.id === id);
-  if (index !== -1) {
-    // Remove related projects
-    projects = projects.filter(p => p.clientId !== id);
-    return clients.splice(index, 1)[0];
+  static addClient(client: Omit<Client, 'id' | 'projectsCount' | 'totalValue'>): Client {
+    const newClient: Client = {
+      ...client,
+      id: `CL${String(this.clients.length + 1).padStart(3, '0')}`,
+      projectsCount: 0,
+      totalValue: '₹0'
+    };
+    this.clients.push(newClient);
+    return newClient;
   }
-  return null;
-};
 
-// CRUD operations for contractors
-export const addContractor = (contractor: Omit<Contractor, 'id'>) => {
-  const newId = Math.max(...contractors.map(c => c.id)) + 1;
-  const newContractor = { ...contractor, id: newId };
-  contractors.push(newContractor);
-  return newContractor;
-};
-
-export const updateContractor = (id: number, updates: Partial<Contractor>) => {
-  const index = contractors.findIndex(c => c.id === id);
-  if (index !== -1) {
-    contractors[index] = { ...contractors[index], ...updates };
-    // Update related projects
-    projects.forEach(project => {
-      if (project.contractorId === id) {
-        project.contractorName = contractors[index].name;
-      }
-    });
-    return contractors[index];
-  }
-  return null;
-};
-
-export const deleteContractor = (id: number) => {
-  const index = contractors.findIndex(c => c.id === id);
-  if (index !== -1) {
-    // Update related projects to remove contractor reference
-    projects.forEach(project => {
-      if (project.contractorId === id) {
-        project.contractorId = 0;
-        project.contractorName = 'Unassigned';
-      }
-    });
-    return contractors.splice(index, 1)[0];
-  }
-  return null;
-};
-
-// CRUD operations for projects
-export const addProject = (project: Omit<Project, 'id'>) => {
-  const projectCount = projects.length + 1;
-  const newId = `AQ${projectCount.toString().padStart(3, '0')}`;
-  const newProject = { ...project, id: newId };
-  projects.push(newProject);
-  
-  // Update client project count
-  const client = clients.find(c => c.id === project.clientId);
-  if (client) {
-    client.projectsCount += 1;
-  }
-  
-  // Update contractor project count
-  const contractor = contractors.find(c => c.id === project.contractorId);
-  if (contractor) {
-    contractor.projectsCount += 1;
-  }
-  
-  return newProject;
-};
-
-export const updateProject = (id: string, updates: Partial<Project>) => {
-  const index = projects.findIndex(p => p.id === id);
-  if (index !== -1) {
-    const oldProject = { ...projects[index] };
-    projects[index] = { ...projects[index], ...updates };
-    
-    // Update client name if clientId changed
-    if (updates.clientId && updates.clientId !== oldProject.clientId) {
-      const client = clients.find(c => c.id === updates.clientId);
-      if (client) {
-        projects[index].clientName = client.name;
-        // Update project counts
-        const oldClient = clients.find(c => c.id === oldProject.clientId);
-        if (oldClient) oldClient.projectsCount -= 1;
-        client.projectsCount += 1;
-      }
+  static updateClient(id: string, updates: Partial<Client>): Client | null {
+    const index = this.clients.findIndex(client => client.id === id);
+    if (index !== -1) {
+      this.clients[index] = { ...this.clients[index], ...updates };
+      return this.clients[index];
     }
-    
-    // Update contractor name if contractorId changed
-    if (updates.contractorId && updates.contractorId !== oldProject.contractorId) {
-      const contractor = contractors.find(c => c.id === updates.contractorId);
-      if (contractor) {
-        projects[index].contractorName = contractor.name;
-        // Update project counts
-        const oldContractor = contractors.find(c => c.id === oldProject.contractorId);
-        if (oldContractor) oldContractor.projectsCount -= 1;
-        contractor.projectsCount += 1;
-      }
-    }
-    
-    return projects[index];
+    return null;
   }
-  return null;
-};
 
-export const deleteProject = (id: string) => {
-  const index = projects.findIndex(p => p.id === id);
-  if (index !== -1) {
-    const project = projects[index];
-    
-    // Update client project count
-    const client = clients.find(c => c.id === project.clientId);
+  static deleteClient(id: string): boolean {
+    const index = this.clients.findIndex(client => client.id === id);
+    if (index !== -1) {
+      this.clients.splice(index, 1);
+      return true;
+    }
+    return false;
+  }
+
+  static getClientById(id: string): Client | null {
+    return this.clients.find(client => client.id === id) || null;
+  }
+
+  // Contractor methods
+  static getContractors(): Contractor[] {
+    return [...this.contractors];
+  }
+
+  static addContractor(contractor: Omit<Contractor, 'id' | 'projectsCount' | 'rating'>): Contractor {
+    const newContractor: Contractor = {
+      ...contractor,
+      id: `CT${String(this.contractors.length + 1).padStart(3, '0')}`,
+      projectsCount: 0,
+      rating: 0
+    };
+    this.contractors.push(newContractor);
+    return newContractor;
+  }
+
+  static updateContractor(id: string, updates: Partial<Contractor>): Contractor | null {
+    const index = this.contractors.findIndex(contractor => contractor.id === id);
+    if (index !== -1) {
+      this.contractors[index] = { ...this.contractors[index], ...updates };
+      return this.contractors[index];
+    }
+    return null;
+  }
+
+  static deleteContractor(id: string): boolean {
+    const index = this.contractors.findIndex(contractor => contractor.id === id);
+    if (index !== -1) {
+      this.contractors.splice(index, 1);
+      return true;
+    }
+    return false;
+  }
+
+  static getContractorById(id: string): Contractor | null {
+    return this.contractors.find(contractor => contractor.id === id) || null;
+  }
+
+  // Project methods
+  static getProjects(): Project[] {
+    return [...this.projects];
+  }
+
+  static addProject(project: Omit<Project, 'id'>): Project {
+    const newProject: Project = {
+      ...project,
+      id: `AQ${String(this.projects.length + 1).padStart(3, '0')}`
+    };
+    this.projects.push(newProject);
+    this.updateClientProjectCount(project.clientId);
+    this.updateContractorProjectCount(project.contractorId);
+    return newProject;
+  }
+
+  static updateProject(id: string, updates: Partial<Project>): Project | null {
+    const index = this.projects.findIndex(project => project.id === id);
+    if (index !== -1) {
+      this.projects[index] = { ...this.projects[index], ...updates };
+      return this.projects[index];
+    }
+    return null;
+  }
+
+  static deleteProject(id: string): boolean {
+    const project = this.projects.find(p => p.id === id);
+    if (project) {
+      const index = this.projects.findIndex(p => p.id === id);
+      this.projects.splice(index, 1);
+      this.updateClientProjectCount(project.clientId);
+      this.updateContractorProjectCount(project.contractorId);
+      return true;
+    }
+    return false;
+  }
+
+  static getProjectById(id: string): Project | null {
+    return this.projects.find(project => project.id === id) || null;
+  }
+
+  // Helper methods for updating counts
+  private static updateClientProjectCount(clientId: string): void {
+    const client = this.clients.find(c => c.id === clientId);
     if (client) {
-      client.projectsCount -= 1;
+      const projectCount = this.projects.filter(p => p.clientId === clientId).length;
+      client.projectsCount = projectCount;
     }
-    
-    // Update contractor project count
-    const contractor = contractors.find(c => c.id === project.contractorId);
-    if (contractor) {
-      contractor.projectsCount -= 1;
-    }
-    
-    return projects.splice(index, 1)[0];
   }
-  return null;
-};
 
-// Getter functions
-export const getClients = () => clients;
-export const getContractors = () => contractors;
-export const getProjects = () => projects;
-export const getClient = (id: number) => clients.find(c => c.id === id);
-export const getContractor = (id: number) => contractors.find(c => c.id === id);
-export const getProject = (id: string) => projects.find(p => p.id === id);
+  private static updateContractorProjectCount(contractorId: string): void {
+    const contractor = this.contractors.find(c => c.id === contractorId);
+    if (contractor) {
+      const projectCount = this.projects.filter(p => p.contractorId === contractorId).length;
+      contractor.projectsCount = projectCount;
+    }
+  }
+
+  // View details methods (for the eye icon functionality)
+  static viewClientDetails(id: string): Client | null {
+    return this.getClientById(id);
+  }
+
+  static viewContractorDetails(id: string): Contractor | null {
+    return this.getContractorById(id);
+  }
+
+  static viewProjectDetails(id: string): Project | null {
+    return this.getProjectById(id);
+  }
+}

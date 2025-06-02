@@ -4,252 +4,359 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTheme } from '../contexts/ThemeContext';
+import { useToast } from '@/hooks/use-toast';
 import { 
-  Save, 
-  Moon, 
-  Sun, 
   Building, 
   User, 
-  Download,
-  Upload,
-  Bell
+  Shield, 
+  Download, 
+  Upload, 
+  Moon, 
+  Sun,
+  Save,
+  RefreshCw
 } from 'lucide-react';
 
 export const Settings = () => {
   const { theme, toggleTheme } = useTheme();
+  const { toast } = useToast();
+  
   const [companyInfo, setCompanyInfo] = useState({
     name: 'AquaBuild Pro',
-    address: 'Mumbai, Maharashtra',
-    gst: '27ABCDE1234F1Z5',
+    address: '123 Pool Street, Mumbai, Maharashtra 400001',
     phone: '+91 98765 43210',
-    email: 'info@aquabuildpro.com'
+    email: 'info@aquabuildpro.com',
+    gst: '27ABCDE1234F1Z5',
+    website: 'www.aquabuildpro.com'
   });
 
-  const [userProfile, setUserProfile] = useState({
-    name: 'Admin User',
-    email: 'admin@aquabuildpro.com',
-    role: 'Administrator'
+  const [userPreferences, setUserPreferences] = useState({
+    notifications: true,
+    emailAlerts: true,
+    smsAlerts: false,
+    currency: 'INR',
+    dateFormat: 'DD/MM/YYYY',
+    timezone: 'Asia/Kolkata'
   });
 
-  const handleCompanyInfoChange = (field: string, value: string) => {
-    setCompanyInfo(prev => ({ ...prev, [field]: value }));
+  const [backupSettings, setBackupSettings] = useState({
+    autoBackup: true,
+    backupFrequency: 'weekly',
+    retentionPeriod: '6months'
+  });
+
+  const handleCompanyInfoSave = () => {
+    toast({
+      title: "Company Information Updated",
+      description: "Your company details have been saved successfully.",
+    });
   };
 
-  const handleUserProfileChange = (field: string, value: string) => {
-    setUserProfile(prev => ({ ...prev, [field]: value }));
+  const handlePreferencesSave = () => {
+    toast({
+      title: "Preferences Updated",
+      description: "Your preferences have been saved successfully.",
+    });
+  };
+
+  const handleExportData = () => {
+    toast({
+      title: "Export Started",
+      description: "Your data export will be ready shortly.",
+    });
+  };
+
+  const handleImportData = () => {
+    toast({
+      title: "Import Data",
+      description: "Please select a backup file to import.",
+    });
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
       </div>
 
       <Tabs defaultValue="company" className="w-full">
-        <TabsList>
-          <TabsTrigger value="company">Company Info</TabsTrigger>
-          <TabsTrigger value="profile">User Profile</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+          <TabsTrigger value="company">Company</TabsTrigger>
           <TabsTrigger value="preferences">Preferences</TabsTrigger>
-          <TabsTrigger value="data">Data Management</TabsTrigger>
+          <TabsTrigger value="security">Security</TabsTrigger>
+          <TabsTrigger value="backup">Backup</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="company" className="space-y-6">
+        <TabsContent value="company" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building className="h-5 w-5" />
+              <CardTitle className="flex items-center">
+                <Building className="h-5 w-5 mr-2" />
                 Company Information
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="company-name">Company Name</Label>
+                  <Label htmlFor="companyName">Company Name</Label>
                   <Input
-                    id="company-name"
+                    id="companyName"
                     value={companyInfo.name}
-                    onChange={(e) => handleCompanyInfoChange('name', e.target.value)}
+                    onChange={(e) => setCompanyInfo({ ...companyInfo, name: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="company-gst">GST Number</Label>
+                  <Label htmlFor="gst">GST Number</Label>
                   <Input
-                    id="company-gst"
+                    id="gst"
                     value={companyInfo.gst}
-                    onChange={(e) => handleCompanyInfoChange('gst', e.target.value)}
+                    onChange={(e) => setCompanyInfo({ ...companyInfo, gst: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="company-phone">Phone Number</Label>
+                  <Label htmlFor="phone">Phone</Label>
                   <Input
-                    id="company-phone"
+                    id="phone"
                     value={companyInfo.phone}
-                    onChange={(e) => handleCompanyInfoChange('phone', e.target.value)}
+                    onChange={(e) => setCompanyInfo({ ...companyInfo, phone: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="company-email">Email Address</Label>
+                  <Label htmlFor="email">Email</Label>
                   <Input
-                    id="company-email"
+                    id="email"
                     type="email"
                     value={companyInfo.email}
-                    onChange={(e) => handleCompanyInfoChange('email', e.target.value)}
+                    onChange={(e) => setCompanyInfo({ ...companyInfo, email: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="website">Website</Label>
+                  <Input
+                    id="website"
+                    value={companyInfo.website}
+                    onChange={(e) => setCompanyInfo({ ...companyInfo, website: e.target.value })}
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="company-address">Address</Label>
-                <Input
-                  id="company-address"
+                <Label htmlFor="address">Address</Label>
+                <Textarea
+                  id="address"
                   value={companyInfo.address}
-                  onChange={(e) => handleCompanyInfoChange('address', e.target.value)}
+                  onChange={(e) => setCompanyInfo({ ...companyInfo, address: e.target.value })}
+                  rows={3}
                 />
               </div>
-              <Button className="bg-blue-600 hover:bg-blue-700">
+              <Button onClick={handleCompanyInfoSave} className="w-full md:w-auto">
                 <Save className="h-4 w-4 mr-2" />
-                Save Company Info
+                Save Company Information
               </Button>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="profile" className="space-y-6">
+        <TabsContent value="preferences" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                User Profile
+              <CardTitle className="flex items-center">
+                <User className="h-5 w-5 mr-2" />
+                User Preferences
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="user-name">Full Name</Label>
-                  <Input
-                    id="user-name"
-                    value={userProfile.name}
-                    onChange={(e) => handleUserProfileChange('name', e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="user-email">Email Address</Label>
-                  <Input
-                    id="user-email"
-                    type="email"
-                    value={userProfile.email}
-                    onChange={(e) => handleUserProfileChange('email', e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="user-role">Role</Label>
-                  <Input
-                    id="user-role"
-                    value={userProfile.role}
-                    onChange={(e) => handleUserProfileChange('role', e.target.value)}
-                  />
-                </div>
-              </div>
-              <Button className="bg-blue-600 hover:bg-blue-700">
-                <Save className="h-4 w-4 mr-2" />
-                Save Profile
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="preferences" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Display Preferences</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-medium text-gray-900 dark:text-white">Theme</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Choose between light and dark mode
-                  </p>
+                <div className="space-y-0.5">
+                  <div className="text-base font-medium">Theme</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    Switch between light and dark mode
+                  </div>
                 </div>
                 <Button variant="outline" onClick={toggleTheme}>
                   {theme === 'light' ? <Moon className="h-4 w-4 mr-2" /> : <Sun className="h-4 w-4 mr-2" />}
                   {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
                 </Button>
               </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="notifications">Push Notifications</Label>
+                    <Switch
+                      id="notifications"
+                      checked={userPreferences.notifications}
+                      onCheckedChange={(checked) => setUserPreferences({ ...userPreferences, notifications: checked })}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="emailAlerts">Email Alerts</Label>
+                    <Switch
+                      id="emailAlerts"
+                      checked={userPreferences.emailAlerts}
+                      onCheckedChange={(checked) => setUserPreferences({ ...userPreferences, emailAlerts: checked })}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="smsAlerts">SMS Alerts</Label>
+                    <Switch
+                      id="smsAlerts"
+                      checked={userPreferences.smsAlerts}
+                      onCheckedChange={(checked) => setUserPreferences({ ...userPreferences, smsAlerts: checked })}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="currency">Currency</Label>
+                    <Select value={userPreferences.currency} onValueChange={(value) => setUserPreferences({ ...userPreferences, currency: value })}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="INR">INR (₹)</SelectItem>
+                        <SelectItem value="USD">USD ($)</SelectItem>
+                        <SelectItem value="EUR">EUR (€)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="dateFormat">Date Format</Label>
+                    <Select value={userPreferences.dateFormat} onValueChange={(value) => setUserPreferences({ ...userPreferences, dateFormat: value })}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
+                        <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
+                        <SelectItem value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="timezone">Timezone</Label>
+                    <Select value={userPreferences.timezone} onValueChange={(value) => setUserPreferences({ ...userPreferences, timezone: value })}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Asia/Kolkata">Asia/Kolkata (IST)</SelectItem>
+                        <SelectItem value="America/New_York">America/New_York (EST)</SelectItem>
+                        <SelectItem value="Europe/London">Europe/London (GMT)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              <Button onClick={handlePreferencesSave} className="w-full md:w-auto">
+                <Save className="h-4 w-4 mr-2" />
+                Save Preferences
+              </Button>
             </CardContent>
           </Card>
+        </TabsContent>
 
+        <TabsContent value="security" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
-                Notification Preferences
+              <CardTitle className="flex items-center">
+                <Shield className="h-5 w-5 mr-2" />
+                Security & Access
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span>Payment reminders</span>
-                  <input type="checkbox" defaultChecked className="rounded" />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="currentPassword">Current Password</Label>
+                  <Input id="currentPassword" type="password" placeholder="Enter current password" />
                 </div>
-                <div className="flex items-center justify-between">
-                  <span>Project updates</span>
-                  <input type="checkbox" defaultChecked className="rounded" />
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">New Password</Label>
+                  <Input id="newPassword" type="password" placeholder="Enter new password" />
                 </div>
-                <div className="flex items-center justify-between">
-                  <span>Meeting notifications</span>
-                  <input type="checkbox" defaultChecked className="rounded" />
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                  <Input id="confirmPassword" type="password" placeholder="Confirm new password" />
                 </div>
+                <Button className="w-full md:w-auto">
+                  Update Password
+                </Button>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="data" className="space-y-6">
+        <TabsContent value="backup" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Data Management</CardTitle>
+              <CardTitle className="flex items-center">
+                <RefreshCw className="h-5 w-5 mr-2" />
+                Backup & Data Management
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div className="space-y-4">
-                <div>
-                  <h3 className="font-medium text-gray-900 dark:text-white mb-2">Export Data</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                    Download all your data in CSV or JSON format
-                  </p>
-                  <div className="flex gap-2">
-                    <Button variant="outline">
-                      <Download className="h-4 w-4 mr-2" />
-                      Export as CSV
-                    </Button>
-                    <Button variant="outline">
-                      <Download className="h-4 w-4 mr-2" />
-                      Export as JSON
-                    </Button>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="autoBackup">Automatic Backup</Label>
+                  <Switch
+                    id="autoBackup"
+                    checked={backupSettings.autoBackup}
+                    onCheckedChange={(checked) => setBackupSettings({ ...backupSettings, autoBackup: checked })}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="backupFrequency">Backup Frequency</Label>
+                    <Select value={backupSettings.backupFrequency} onValueChange={(value) => setBackupSettings({ ...backupSettings, backupFrequency: value })}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="daily">Daily</SelectItem>
+                        <SelectItem value="weekly">Weekly</SelectItem>
+                        <SelectItem value="monthly">Monthly</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="retentionPeriod">Retention Period</Label>
+                    <Select value={backupSettings.retentionPeriod} onValueChange={(value) => setBackupSettings({ ...backupSettings, retentionPeriod: value })}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="3months">3 Months</SelectItem>
+                        <SelectItem value="6months">6 Months</SelectItem>
+                        <SelectItem value="1year">1 Year</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
+              </div>
 
-                <div>
-                  <h3 className="font-medium text-gray-900 dark:text-white mb-2">Import Data</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                    Import data from CSV files
-                  </p>
-                  <Button variant="outline">
+              <div className="border-t pt-6">
+                <h3 className="text-lg font-medium mb-4">Data Export/Import</h3>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button onClick={handleExportData} variant="outline" className="flex-1">
+                    <Download className="h-4 w-4 mr-2" />
+                    Export All Data
+                  </Button>
+                  <Button onClick={handleImportData} variant="outline" className="flex-1">
                     <Upload className="h-4 w-4 mr-2" />
-                    Import from CSV
+                    Import Data
                   </Button>
                 </div>
-
-                <div className="border-t pt-4">
-                  <h3 className="font-medium text-red-600 mb-2">Danger Zone</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                    Irreversible actions that will permanently delete data
-                  </p>
-                  <Button variant="destructive">
-                    Clear All Data
-                  </Button>
-                </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  Export your data in JSON or CSV format, or import from a backup file.
+                </p>
               </div>
             </CardContent>
           </Card>
