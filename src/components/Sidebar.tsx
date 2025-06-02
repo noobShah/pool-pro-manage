@@ -115,7 +115,7 @@ export const Sidebar = () => {
             >
               <item.icon className="h-5 w-5 mr-3" />
               {item.name}
-            </Item>
+            </NavLink>
           ))}
         </div>
       </nav>
