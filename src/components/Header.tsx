@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Search, Bell, Settings, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useTheme } from '../contexts/ThemeContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -15,7 +16,8 @@ export const Header = () => {
     <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <h1 className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent ${isMobile ? 'ml-12' : ''}`}>
+          <SidebarTrigger />
+          <h1 className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent`}>
             AquaBuild Pro
           </h1>
         </div>

@@ -1,29 +1,27 @@
 
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { Sidebar } from './Sidebar';
-import { Header } from './Header';
 import { ThemeProvider } from '../contexts/ThemeContext';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { AppSidebar } from './AppSidebar';
+import { Header } from './Header';
 
 export const Layout = () => {
-  const isMobile = useIsMobile();
-
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-background text-foreground">
-        <div className="flex">
-          <Sidebar />
-          <div className={`flex-1 flex flex-col ${isMobile ? 'ml-0' : ''}`}>
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full bg-background text-foreground">
+          <AppSidebar />
+          <SidebarInset>
             <Header />
-            <main className={`flex-1 p-2 md:p-6 bg-gray-50 dark:bg-gray-900/50 ${isMobile ? 'pt-20' : ''}`}>
+            <main className="flex-1 p-2 md:p-6 bg-gray-50 dark:bg-gray-900/50">
               <div className="max-w-full">
                 <Outlet />
               </div>
             </main>
-          </div>
+          </SidebarInset>
         </div>
-      </div>
+      </SidebarProvider>
     </ThemeProvider>
   );
 };
