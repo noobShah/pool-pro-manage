@@ -27,7 +27,7 @@ export const Settings = () => {
   const { toast } = useToast();
   
   const [companyInfo, setCompanyInfo] = useState({
-    name: 'AquaBuild Pro',
+    name: 'Associated Pools',
     address: '123 Pool Street, Mumbai, Maharashtra 400001',
     phone: '+91 98765 43210',
     email: 'info@aquabuildpro.com',

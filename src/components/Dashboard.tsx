@@ -19,7 +19,12 @@ import {
 const navigationTabs = [
   // Row 1
   [
-    { name: 'AquaBuild Pro', href: null, icon: Waves, isLogo: true },
+    { 
+      name: 'Associated Pools', 
+      href: null, 
+      icon: () => <img src="/logo.jpg" alt="Company Logo" className="h-6 w-6 md:h-8 md:w-8" />, 
+      isLogo: true 
+    },
     { name: 'Login', href: '/login', icon: LogIn },
   ],
   // Row 2

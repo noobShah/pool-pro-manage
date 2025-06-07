@@ -2,6 +2,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
+  LayoutDashboard,
   LogIn,
   FolderOpen, 
   Users, 
@@ -27,6 +28,7 @@ import {
 import { cn } from '@/lib/utils';
 
 const navigation = [
+  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Login', href: '/login', icon: LogIn },
   { name: 'Projects', href: '/projects', icon: FolderOpen },
   { name: 'Clients', href: '/clients', icon: Users },
@@ -43,12 +45,14 @@ export const AppSidebar = () => {
   return (
     <Sidebar>
       <SidebarHeader className="border-b border-gray-200 dark:border-gray-700">
+      <NavLink to={'/'}>
         <div className="flex items-center p-4">
-          <Waves className="h-8 w-8 text-blue-600" />
+        <img src="/logo.jpg" alt="Company Logo" className="h-6 w-6 md:h-8 md:w-8" />
           <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white group-data-[collapsible=icon]:hidden">
             AquaBuild
           </span>
         </div>
+        </NavLink>
       </SidebarHeader>
       
       <SidebarContent>
